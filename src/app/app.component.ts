@@ -10,7 +10,8 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [RouterOutlet, HeaderComponent, PostCreateComponent, PostListComponent, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  host: { 'ngSkipHydration': '' }
 })
 export class AppComponent {
   title = 'mean-course';
