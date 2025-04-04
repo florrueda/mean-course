@@ -1,0 +1,20 @@
+a {
+  text-decoration: none;
+  color: white;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.spacer {
+  flex: 1 1 auto ;
+}
+
+mat-toolbar {
+  background-color: #3f51b5;
+  color: white;
+  height: 64px;
+}
