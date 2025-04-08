@@ -7,25 +7,29 @@ import { PostsService } from "../posts.service";
 import {MatExpansionModule} from '@angular/material/expansion';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from "@angular/material/button";
+import { RouterLink } from "@angular/router";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @Component({
   selector: "app-post-list",
   templateUrl: "./post-list.component.html",
   styleUrls: ["./post-list.component.css"],
   standalone: true,
-  imports: [MatExpansionModule,MatButtonModule,  CommonModule]
+  imports: [MatExpansionModule,MatButtonModule,  CommonModule, RouterLink, MatProgressSpinnerModule]
 })
 export class PostListComponent implements OnInit, OnDestroy {
   posts: Post[] = [];
+  isLoading = false;
   private postsSub: Subscription = new Subscription();
 
   constructor(public postsService: PostsService, private cdRef: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.postsService.getPosts();
-  this.postsSub = this.postsService.getPostUpdateListener()
+    this.isLoading = true;
+    this.postsSub = this.postsService.getPostUpdateListener()
     .subscribe((posts: Post[]) => {
-      console.log('📢 Received Updated Posts:', posts);
+      this.isLoading = false;
       this.posts = posts;
       this.cdRef.detectChanges(); // 🔥 Fuerza la actualización de la vista
     });
