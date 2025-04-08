@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -15,6 +16,7 @@ mongoose.connect('mongodb+srv://florrueda:i80Fb15G6uT4v4wI@cluster0.jbv0umk.mong
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use('/images', express.static(path.join('backend/images')));
 
 app.use((request, response, next) => {
   response.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,6 +24,8 @@ app.use((request, response, next) => {
   response.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
   next();
 });
+
+
 
 app.use('/api/posts', postsRoutes)
 
