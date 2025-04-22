@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { map, ReplaySubject, Subject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Post } from './post.model';
 import { Router } from '@angular/router';
@@ -14,20 +14,23 @@ export class PostsService {
 
   getPosts(postsPerPage: number, currentPage: number) {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
-    this.httpClient.get<{message: string, posts: any, maxPosts: number}>('http://localhost:3000/api/posts'+queryParams)
+    this.httpClient.get<{message: string, posts: any, maxPosts: number}>('http://localhost:3000/api/posts'+ queryParams)
       .pipe(map(postData => {
         return {
-        posts: postData.posts.map((post: { title: string, content: string, _id: string, imagePath: string }) => {
+        posts: postData.posts.map((post: any) => {
           return {
             title: post.title,
             content: post.content,
             id: post._id,
-            imagePath: post.imagePath
+            imagePath: post.imagePath,
+            creator: post.creator
           };
         }),
         maxPosts: postData.maxPosts};
       }))
       .subscribe((transformedPosts) => {
+        console.log('📦 Posts received:', transformedPosts);
+
       this.posts = transformedPosts.posts;
       this.postsUpdated.next({posts: [...this.posts], postCount: transformedPosts.maxPosts});  // 🚀 Notificar actualización
       }
@@ -40,21 +43,33 @@ export class PostsService {
   }
 
   getPost(id: string) {
-    return this.httpClient.get<{_id: string, title: string, content: string, imagePath: string }>('http://localhost:3000/api/posts/' + id);
+    return this.httpClient.get<{_id: string, title: string, content: string, imagePath: string, creator: string }>('http://localhost:3000/api/posts/' + id);
   }
 
   addPost(title: string, content: string, image: File) {
+    const authToken = localStorage.getItem('token');  // Obtener el token desde localStorage
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${authToken}`  // Agregar el token en las cabeceras
+  });
+
     const postData = new FormData();
     postData.append('title', title);
     postData.append('content', content);
     postData.append('image', image, title);
-    this.httpClient.post<{message: string, post: Post}>('http://localhost:3000/api/posts', postData)
+    this.httpClient.post<{message: string, post: Post}>('http://localhost:3000/api/posts', postData, { headers })
       .subscribe((responseData) => {
+        console.log(responseData);
+
         this.router.navigate(["/"])
       })
   }
 
   updatePost(id: string, title: string, content: string, image: File | string) {
+    const authToken = localStorage.getItem('token');  // Obtener el token desde localStorage
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${authToken}`  // Agregar el token en las cabeceras
+  });
+
     let postData;
     if(typeof image === 'object') {
       postData = new FormData();
@@ -67,11 +82,12 @@ export class PostsService {
         id: id,
         title: title,
         content: content,
-        imagePath: image
+        imagePath: image,
+        creator: null
       }
     }
     this.httpClient
-    .put('http://localhost:3000/api/posts/' + id, postData)
+    .put('http://localhost:3000/api/posts/' + id, postData, { headers })
     .subscribe(response => {
       this.router.navigate(["/"])
 
@@ -79,7 +95,11 @@ export class PostsService {
   }
 
   deletePost(postId: string) {
-    return this.httpClient.delete('http://localhost:3000/api/posts/' + postId)
+    const authToken = localStorage.getItem('token');  // Obtener el token desde localStorage
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`  // Agregar el token en las cabeceras
+    });
+    return this.httpClient.delete('http://localhost:3000/api/posts/' + postId,  { headers })
   }
 
 

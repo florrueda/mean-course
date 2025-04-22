@@ -1,11 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 const User = require('../models/user');
 
 const router = express.Router();
 
+// Ruta de signup
 router.post('/signup', (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
   .then(hash => {
@@ -21,50 +21,59 @@ router.post('/signup', (req, res, next) => {
       });
     })
     .catch(err => {
+      console.log(err);  // Agregar logging para detectar posibles problemas
       res.status(500).json({
-        error:err
-      })
+        error: err
+      });
     })
+  })
+  .catch(err => {
+    console.log(err);  // Agregar logging por si el hash falla
+    res.status(500).json({
+      message: 'Password hashing failed',
+      error: err
+    });
   });
+});
 
+// Ruta de login
 router.post('/login', (req, res, next) => {
   let fetchedUser;
   User.findOne({ email: req.body.email })
   .then(user => {
-    console.log(user);
+    console.log('User found:', user);  // Para ver si el usuario es encontrado
     if(!user) {
       return res.status(401).json({
-        message: 'Auth failed'
+        message: 'Auth failed - user not found'
       });
     }
     fetchedUser = user;
-    return bcrypt.compare(req.body.password, user.password)
+    return bcrypt.compare(req.body.password, user.password);
   })
   .then(result => {
     if(!result) {
       return res.status(401).json({
-        message: 'Auth failed'
+        message: 'Auth failed - incorrect password'
       });
     }
     const token = jwt.sign({
       email: fetchedUser.email,
       userId: fetchedUser._id
-    }, 'secret_this_should_be_longer',
-    {expiresIn: '1h'})
+    }, 'secret_this_should_be_longer', { expiresIn: '1h' });
+
     res.status(200).json({
       token: token,
-      expiresIn: '3600',
-    })
-  })
-  .catch(err => {
-    console.log(err);
-    return res.status(401).json({
-    message: 'Auth failed'
+      expiresIn: '3600',  // Debe ser en segundos (3600 = 1 hora)
+      userId: fetchedUser._id
     });
   })
-})
-
-
-})
+  .catch(err => {
+    console.log(err);  // Agregar logging para ver el error exacto
+    return res.status(500).json({
+      message: 'Auth failed',
+      error: err
+    });
+  });
+});
 
 module.exports = router;
