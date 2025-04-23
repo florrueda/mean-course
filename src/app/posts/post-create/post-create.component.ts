@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 
@@ -12,6 +12,8 @@ import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { ActivatedRoute, ParamMap } from "@angular/router";
 import { Post } from "../post.model";
 import { mimeType } from "./mime-type.validator";
+import { Subscription } from "rxjs";
+import { AuthService } from "../../auth/auth.service";
 
 @Component({
   selector: "app-post-create",
@@ -20,7 +22,7 @@ import { mimeType } from "./mime-type.validator";
   standalone: true,
   imports: [MatCard, MatFormFieldModule, MatInputModule , CommonModule, MatButtonModule, MatProgressSpinnerModule, ReactiveFormsModule]
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit , OnDestroy{
   enteredTitle = "";
   enteredContent = "";
   post: Post = {
@@ -33,6 +35,7 @@ export class PostCreateComponent implements OnInit {
   isLoading = false;
   private mode = "create";
   private postId: string = '';
+  private authStatusSub: Subscription = new Subscription();
 
   form: FormGroup =  new FormGroup({
     title: new FormControl(null, { validators: [Validators.required, Validators.minLength(3)]}),
@@ -41,10 +44,13 @@ export class PostCreateComponent implements OnInit {
   })
   imagePreview: string = '';
 
-  constructor(public postsService: PostsService, public route: ActivatedRoute) {}
+  constructor(public postsService: PostsService, public route: ActivatedRoute, private authService: AuthService) {}
 
   ngOnInit(): void {
-
+    this.authStatusSub = this.authService.getAuthStatusListener().subscribe
+      (authStatus => {
+        this.isLoading = false;
+      })
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if(paramMap.has('postId')) {
         this.mode = 'edit';
@@ -99,6 +105,9 @@ export class PostCreateComponent implements OnInit {
     this.form.reset()
   }
 
+  ngOnDestroy(): void {
+    this.authStatusSub.unsubscribe();
+  }
 
 
 }

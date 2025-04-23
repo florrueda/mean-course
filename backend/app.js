@@ -7,7 +7,9 @@ const mongoose = require('mongoose');
 const postsRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
 
-mongoose.connect('mongodb+srv://florrueda:i80Fb15G6uT4v4wI@cluster0.jbv0umk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+require('dotenv').config();
+
+mongoose.connect("mongodb+srv://florrueda:" + process.env.MONGO_ATLAS_PW + "@cluster0.jbv0umk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 .then(() => {
   console.log('Connected to database!');
 })

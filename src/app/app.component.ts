@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { LoginComponent } from './auth/login/login.component';
 import { SignUpComponent } from './auth/signup/signup.component';
 import { AuthService } from './auth/auth.service';
+import { ErrorComponent } from './error/error.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-root',
