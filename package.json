@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:mean-course": "node dist/mean-course/server/server.mjs",
-    "start:server": "nodemon server.js"
+    "start:server": "nodemon ./backend/server.js"
   },
   "private": true,
   "dependencies": {

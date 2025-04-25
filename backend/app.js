@@ -7,7 +7,8 @@ const mongoose = require('mongoose');
 const postsRoutes = require('./routes/posts');
 const userRoutes = require('./routes/user');
 
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/../.env' });
+console.log('pass',process.env.MONGO_ATLAS_PW);
 
 mongoose.connect("mongodb+srv://florrueda:" + process.env.MONGO_ATLAS_PW + "@cluster0.jbv0umk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
 .then(() => {
@@ -32,5 +33,8 @@ app.use((request, response, next) => {
 
 app.use('/api/posts', postsRoutes)
 app.use('/api/user', userRoutes)
+app.use((req, res, next) => {
+  res.sendFile(path.join(__dirname, 'angular/browser', 'index.html'));
+})
 
 module.exports = app;

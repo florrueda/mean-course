@@ -1,0 +1,23 @@
+{
+  "name": "mean-course",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node backend/server.js",
+    "serve:ssr:mean-course": "node dist/mean-course/server/server.mjs",
+    "start:server": "nodemon ./backend/server.js"
+  },
+  "private": true,
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.6.0",
+    "mongoose-unique-validator": "^4.0.1",
+    "multer": "^1.4.5-lts.2",
+    "nodemon": "^3.1.9",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.10"
+  }
+}
